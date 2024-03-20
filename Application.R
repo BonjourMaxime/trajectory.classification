@@ -7,6 +7,8 @@
 
 # last version : 20/03/2024
 
+# setwd()
+
 ## Libraries
 library("tidyverse")
 library("lme4")
@@ -20,8 +22,7 @@ library("cowplot")
 source("HPV.function.classi3.R")
 
 ## get the data
-temp1 <- load('data.application.RData')
-
+temp1 <- readRDS('data.application.rds')
 
 ## Classification 
 ### with fixed effect:
@@ -40,7 +41,7 @@ save(Traj1.4, file = "Traj1.4.RData")
 
 ### with mixed effect:
 #### 2 groups
-Traj2.2 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom="denom",clust="id",nb.grp=2,inter.grp=c("time","time2"),max.iter=200,simul=50,seed=200421,rdm.eff="time",nb.aghq=1)
+Traj2.2 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom="denom",clust="id",nb.grp=2,inter.grp=c("time","time2"),max.iter=200,simul=10,seed=200421,rdm.eff="time",nb.aghq=1)
 save(Traj2.2, file = "Traj2.2.RData")
 
 #### 3 groups
@@ -48,7 +49,7 @@ Traj2.3 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom=
 save(Traj2.3, file = "Traj2.3.RData")
 
 #### 4 groups
-Traj2.4 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom="denom",clust="id",nb.grp=4,inter.grp=c("time","time2"),max.iter=200,simul=50,seed=200421,rdm.eff="time",nb.aghq=1)
+Traj2.4 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom="denom",clust="id",nb.grp=4,inter.grp=c("time","time2"),max.iter=200,simul=10,seed=200421,rdm.eff="time",nb.aghq=1)
 save(Traj2.4, file = "Traj2.4.RData")
 
 
@@ -111,6 +112,8 @@ Traj2.4$glmer1 %>% BIC
 
 
 ## Models figures
+age.intercept <- 30
+
 ### With fixed effects
 a <- graph.result.1(Traj1.2, age.intercept = age.intercept)
 b <- graph.result.1(Traj1.3, age.intercept = age.intercept)
