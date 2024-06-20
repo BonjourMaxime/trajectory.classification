@@ -41,7 +41,7 @@ save(Traj1.4, file = "Traj1.4.RData")
 
 ### with mixed effect:
 #### 2 groups
-Traj2.2 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom="denom",clust="id",nb.grp=2,inter.grp=c("time","time2"),max.iter=200,simul=10,seed=200421,rdm.eff="time",nb.aghq=1)
+Traj2.2 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom="denom",clust="id",nb.grp=2,inter.grp=c("time","time2"),max.iter=200,simul=50,seed=200421,rdm.eff="time",nb.aghq=1)
 save(Traj2.2, file = "Traj2.2.RData")
 
 #### 3 groups
@@ -49,7 +49,7 @@ Traj2.3 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom=
 save(Traj2.3, file = "Traj2.3.RData")
 
 #### 4 groups
-Traj2.4 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom="denom",clust="id",nb.grp=4,inter.grp=c("time","time2"),max.iter=200,simul=10,seed=200421,rdm.eff="time",nb.aghq=1)
+Traj2.4 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom="denom",clust="id",nb.grp=4,inter.grp=c("time","time2"),max.iter=200,simul=50,seed=200421,rdm.eff="time",nb.aghq=1)
 save(Traj2.4, file = "Traj2.4.RData")
 
 
@@ -69,44 +69,32 @@ save(Traj2.4, file = "Traj2.4.RData")
 ### with fixed effect:
 #### 2 groups
 Traj1.2$final.prop.group
-Traj1.2$ite.max
-Traj1.2$bon.group
 Traj1.2$ICL.BIC
 Traj1.2$glm1 %>% BIC
 
 #### 3 groups
 Traj1.3$final.prop.group
-Traj1.3$ite.max
-Traj1.3$bon.group
 Traj1.3$ICL.BIC
 Traj1.3$glm1 %>% BIC
 
 #### 4 groups
 Traj1.4$final.prop.group
-Traj1.4$ite.max
-Traj1.4$bon.group
 Traj1.4$ICL.BIC
 Traj1.4$glm1 %>% BIC
 
 ### with mixed effect:
 #### 2 groups
 Traj2.2$final.prop.group
-Traj2.2$ite.max
-Traj2.2$bon.group
 Traj2.2$ICL.BIC
 Traj2.2$glmer1 %>% BIC
 
 #### 3 groups
 Traj2.3$final.prop.group
-Traj2.3$ite.max
-Traj2.3$bon.group
 Traj2.3$ICL.BIC
 Traj2.3$glmer1 %>% BIC
 
 #### 4 groups
 Traj2.4$final.prop.group
-Traj2.4$ite.max
-Traj2.4$bon.group
 Traj2.4$ICL.BIC
 Traj2.4$glmer1 %>% BIC
 

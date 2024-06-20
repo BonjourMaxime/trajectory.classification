@@ -4,8 +4,8 @@
 
 # Based on : http://tinyheero.github.io/2016/01/03/gmm-em.html
 
-# last version : 20/04/2020
-# last version : 20/12/2023
+# Version 1 : 20/04/2020
+# Version 2 : 20/12/2023
 
 Correct <- function(Res){
   ## If evaluates at NA, return maximum value
