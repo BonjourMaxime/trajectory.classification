@@ -18,14 +18,14 @@ library("numDeriv")
 library("RColorBrewer")
 library("cowplot")
 
-## functions
+## Functions
 source("HPV.function.classi3.R")
 
-## get the data
+## Import the data
 temp1 <- readRDS('data.application.rds')
 
-## Classification 
-### with fixed effect:
+## Trajectory Classification 
+### with fixed effect (without heterogenity):
 #### 2 groups
 Traj1.2 <- MyTrajEM.fixed(data = temp1, formula=~ 1+time+time2,num="value",denom="denom",clust="id",nb.grp=2,inter.grp=c("time","time2"),max.iter=200,simul=500,seed=200421)
 save(Traj1.2, file = "Traj1.2.RData")
@@ -39,7 +39,7 @@ Traj1.4 <- MyTrajEM.fixed(data = temp1, formula=~1+time+time2,num="value",denom=
 save(Traj1.4, file = "Traj1.4.RData")
 
 
-### with mixed effect:
+### with mixed effect (with heterogenity):
 #### 2 groups
 Traj2.2 <- MyTrajEM.mixed(data = temp1, formula=~1+time+time2,num="value",denom="denom",clust="id",nb.grp=2,inter.grp=c("time","time2"),max.iter=200,simul=50,seed=200421,rdm.eff="time",nb.aghq=1)
 save(Traj2.2, file = "Traj2.2.RData")
@@ -68,9 +68,9 @@ save(Traj2.4, file = "Traj2.4.RData")
 ## Models characteristics
 ### with fixed effect:
 #### 2 groups
-Traj1.2$final.prop.group
-Traj1.2$ICL.BIC
-Traj1.2$glm1 %>% BIC
+Traj1.2$final.prop.group     # proportion of trajectories in each cluster
+Traj1.2$ICL.BIC              #ICL_BIC indicator
+Traj1.2$glm1 %>% BIC         #BIC indicator
 
 #### 3 groups
 Traj1.3$final.prop.group
@@ -100,6 +100,9 @@ Traj2.4$glmer1 %>% BIC
 
 
 ## Models figures
+
+Graphic representation of the clusters trajectories identified
+
 age.intercept <- 30
 
 ### With fixed effects
