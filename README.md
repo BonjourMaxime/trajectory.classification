@@ -1,11 +1,15 @@
 # trajectory.classification
-Repository for Binomial Trajectory Classification article
+Repository for the article: 'Binomial random effects model-based classification approach to cluster worldwide age specific human papillomavirus prevalence patterns'
 
 
-Main code : Application.R
+Main code to use: 
+  - Application.R
 
-Functions used : 
+Database (simulated from the read data of the article): 
+  - data.application.rds
+  - 
+Functions used: 
   - HPV.function.classi3.R
   - LogitAGHQ2.R
 
-Database : data.application.rds
+
