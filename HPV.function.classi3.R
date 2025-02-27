@@ -18,12 +18,8 @@ library("gghighlight")
 require("maps")
 library("readxl")
 
-# setwd("C:/Users/bonjourm/Desktop/VaccineGap/Analysis/Classification IARC/")
-# setwd("~/Downloads/classification/")
-# source("C:/Users/bonjourm/Desktop/These_Science/Part 4 Trajectories Classification/analysis/LogitAGHQ2.R")
-source("LogitAGHQ2.R")
 
-# coord_location <- read_excel("Location.xlsx")
+source("LogitAGHQ2.R")
 
 
 ## Load the df.sampling object
