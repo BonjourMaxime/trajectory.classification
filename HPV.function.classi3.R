@@ -21,36 +21,19 @@ library("readxl")
 
 source("LogitAGHQ2.R")
 
-
-## Load the df.sampling object
-## TODO save this object as .rds
-load("df.sampling.RData")
-
 #### Algo Fixed
 
-df.clust <- df.sampling %>%
-  filter(mid.age >= 18, mid.age <= 70) %>%
-  transmute(
-    id = ID,
-    time = mid.age,
-    time2 = mid.age * mid.age,
-    time3 = mid.age * mid.age * mid.age,
-    value = num_HR,
-    denom
-  )
-
-############ test
-# temp <- df.clust
-# data = temp
-# formula=~1+time+time2+time3
-# num="value"
-# denom="denom"
-# clust="id"
-# nb.grp=4
-# inter.grp=c("time","time2","time3")
-# max.iter=50
-# simul=10
-# seed=200421
+############ Inputs 
+# data = dataframe used
+# formula= fixed effect formula to cluster functional form of trajectory (eg: ~1+time+time2+time3)
+# num= name of variable for the number of success of the binary outcome
+# denom= name of variable for the denominator of the binary outcome
+# clust= name of variable for the identifier of trajectories
+# nb.grp= number of latent groups to cluster
+# inter.grp= variables in interaction with the groups (eg : c("time","time2")). The variables that will have different estimations according the cluster.
+# max.iter= set the max iteration the CEM algorithm have to perform (default = 50)
+# simul= set the number of random inital partition the CEM algorithm have to perform (default = 10)
+# seed= select a seed for result reproducibility
 
 ############
 MyTrajEM.fixed <- function(data, formula = ~ 1 + time + time2, num = "value", denom = "denom", clust = "id", nb.grp = 3, inter.grp = c("time", "time2"), max.iter = 50, simul = 10, seed = 200421) {
@@ -64,7 +47,7 @@ MyTrajEM.fixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
     which(data[, clust][[1]] == Clust[x, 1][[1]])
   }, simplify = FALSE)
 
-  ## Model considered (partie fixe)
+  ## Model considered (fixed part)
   ## Group-independent
   Design <- model.matrix(formula, data = data)
   fix.var <- colnames(Design)
@@ -112,7 +95,7 @@ MyTrajEM.fixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
       table.vraiss[, i] <- sapply(1:NbClust, ClustLogLik.fix, beta = beta.vec.i)
     }
 
-    ## selection de la -log.lkike la plus petite, attribution des nouveaux groupes
+    ## selection of lowest -log.likelihood, and new groups attribution 
     if (length(t(table.vraiss)) %% length(pi.pre) != 0) {
       browser()
     }
@@ -120,12 +103,12 @@ MyTrajEM.fixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
     vraiss <- apply(vraiss.group, 1, max)
     group.aug.new <- apply(vraiss.group, 1, which.max)
 
-    # Calcul de l'ICL-BIC
+    # ICL-BIC calculation
     sum.vraiss <- apply(exp(table.vraiss), 1, sum)
     log.proba.appart <- vraiss.group - log(sum.vraiss)
     sum.log.proba.appart <- sum(log.proba.appart * exp(log.proba.appart))
 
-    ## calcul de la loglikelihood totale du modele
+    ## Model total loglikelihood calculation 
     sum.of.comps.sum <- sum(vraiss)
 
     list(
@@ -176,7 +159,7 @@ MyTrajEM.fixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
 
     ## temp <- temp %>% group_by(id) %>% summarise(group.aug = factor(sample (c(1:nb.grp),size=1, replace=TRUE), levels = c(1:nb.grp))) %>% right_join(temp, by = "id")
 
-    ## pi.pre.init <- prop.table(table((temp %>% group_by(id) %>% slice(1) %>% select(group.aug))[,2]))  #voir pour enlever le "Adding missing groupin variables"
+    ## pi.pre.init <- prop.table(table((temp %>% group_by(id) %>% slice(1) %>% select(group.aug))[,2]))  
 
     eval(parse(text = paste0("glm.m.init  <-  try(glm(cbind(", num, ",Denum) ~", as.character(formula)[2], "+(", formul.inter, ")*group.aug, data = temp, family = \"binomial\"),silent=TRUE)")))
 
@@ -256,14 +239,11 @@ MyTrajEM.fixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
     final.ICL.BIC <- ICL.BIC[[num.final]]
   }
 
-  ## Plot des resultats
+  ## Result plots
 
-  ## recuperation des effets fixes du modele selectionne et creation des
-  ## reponses aux effets fixes a chaque temps
+  ## Fixed effect retrieval of selected model and creation of fixed effect response for each time
   MyTime <- seq(min(data$time), max(data$time), by = 1)
-  # graph <- cbind(1,MyTime,MyTime^2)   # Hadrien
 
-  # Moi 05.08.2024
   n.exp <- str_count(paste0(formula[2]), "time")
   graph <- matrix(
     nrow = length(MyTime),
@@ -286,10 +266,10 @@ MyTrajEM.fixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
 
   data$group.final <- group.alloc
 
-  ## Iteration max atteinte
+  ## Is max iteration reached
   ite.max <- sum(nb.iteration == max.iter)
 
-  ## Bon nombre de groupe
+  ## Proportion of right number of group selected
   bon.group <- sum(nb.group == nb.grp) / simul
 
 
@@ -299,20 +279,19 @@ MyTrajEM.fixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
 
 
 
-###### test
-# temp <- df1
-# data = temp1
-# formula=~1+time+time2
-# num="value"
-# denom="denom"
-# clust="id"
-# nb.grp=4
-# inter.grp=c("time","time2")
-# max.iter=50
-# simul=10
-# seed=200421
-# rdm.eff="time"
-# nb.aghq=1
+############ Inputs 
+# data = dataframe used
+# formula= fixed effect formula to cluster functional form of trajectory (eg: ~1+time+time2+time3)
+# num= name of variable for the number of success of the binary outcome
+# denom= name of variable for the denominator of the binary outcome
+# clust= name of variable for the identifier of trajectories
+# nb.grp= number of latent groups to cluster
+# inter.grp= variables in interaction with the groups (eg : c("time","time2")). The variables that will have different estimations according the cluster.
+# max.iter= set the max iteration the CEM algorithm have to perform (default = 50)
+# simul= set the number of random inital partition the CEM algorithm have to perform (default = 10)
+# seed= select a seed for result reproducibility
+# rdm.eff= name of variable for which to take into account the random effect (eg: "time")
+# nb.aghq= number of node used in the Adaptive Gauss-Hermite Quadrature (default = 1 for a first-order Laplace Approximation)
 
 
 ##### Algo mixed
@@ -327,7 +306,7 @@ MyTrajEM.mixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
     which(data[, clust][[1]] == Clust[x, 1][[1]])
   }, simplify = FALSE)
 
-  ## Model considered (partie fixe)
+  ## Model considered (fixed part)
   ## Group-independent
   Design <- model.matrix(formula, data = data)
   fix.var <- colnames(Design)
@@ -377,7 +356,7 @@ MyTrajEM.mixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
     ## Matrix of random effects
     B <- matrix(bdiag(VarCorr(glmer.m)), n.rand, n.rand)
 
-    ## effets fixes + calcul de la log.like par groupe
+    ## fixed effects + log.likelihood calculation by groups 
     test.beta <- summary(glmer.m)$coefficient[, 1]
     beta.vec.1 <- test.beta[fix.var]
     table.vraiss[, 1] <- sapply(1:NbClust, ClustLogLik, beta = beta.vec.1, pos = pos, Sigma = B)
@@ -387,20 +366,20 @@ MyTrajEM.mixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
       table.vraiss[, i] <- sapply(1:NbClust, ClustLogLik, beta = beta.vec.i, pos = pos, Sigma = B)
     }
 
-    ## selection de la log.lkike la plus petite, attribution des nouveaux groupes
+    ##  selection of lowest -log.likelihood, and new groups attribution 
     vraiss.group <- t(t(table.vraiss) - log(c(pi.pre)))
     vraiss <- apply(vraiss.group, 1, min)
     group.aug.new <- apply(vraiss.group, 1, which.min)
 
 
-    # Calcul de l'ICL-BIC
+    # ICL-BIC calculation
     sum.vraiss <- apply(exp(-table.vraiss), 1, sum)
     log.proba.appart <- -vraiss.group - log(sum.vraiss)
     log.proba.appart[log.proba.appart == (Inf)] <- 0
     sum.log.proba.appart <- sum(log.proba.appart * exp(log.proba.appart))
 
 
-    ## calcul de la loglikelihood totale du modele
+    ## Model total loglikelihood calculation
     sum.of.comps.sum <- -sum(vraiss)
 
     list(
@@ -464,7 +443,7 @@ MyTrajEM.mixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
     } else {
       e.step <- e_step(glmer.m.init, pi.pre.init)
 
-      ## AJOUT MF ##
+     
       if (traces == T) {
         cat("\n", "__________________________", "\n")
         cat("\n", "glmer initital", "\n")
@@ -473,7 +452,7 @@ MyTrajEM.mixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
         cat("\n", "pi pre initital", "\n")
         print(pi.pre.init)
       }
-      ## AJOUT MF ##
+     
 
       eval(parse(text = paste0("data.temp <- data.frame(", clust, " = Clust, group.aug = e.step[[\"group.aug.new\"]])")))
       temp <- left_join(subset(temp, select = -group.aug), data.temp, by = clust)
@@ -486,7 +465,7 @@ MyTrajEM.mixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
 
     if ((nb.group.aug == nb.grp) & (!inherits(m.step[["glmer"]], "try-error"))) {
       for (i in 1:max.iter) {
-        ## Repeat E and M steps till convergence
+        ## Repeat E and M steps untill convergence
         e.step <- e_step(m.step[["glmer"]], m.step[["pi.pre"]])
 
         eval(parse(text = paste0("data.temp <- data.frame(", clust, " = Clust, group.aug = e.step[[\"group.aug.new\"]])")))
@@ -557,14 +536,13 @@ MyTrajEM.mixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
     final.ICL.BIC <- ICL.BIC[[num.final]]
   }
 
-  ## Plot des resultats
+  ## Results plot
 
-  ## recuperation des effets fixes du modele selectionne et creation des
-  ## reponses aux effets fixes a chaque temps
+  ## Fixed effect retrieval of selected model and creation of fixed effect response for each time
   MyTime <- seq(min(data$time), max(data$time), by = 1)
   # graph <- cbind(1,MyTime,MyTime^2)  # Hadrien
 
-  # Moi 05.08.2024
+ 
   n.exp <- str_count(paste0(formula[2]), "time")
   graph <- matrix(
     nrow = length(MyTime),
@@ -573,7 +551,7 @@ MyTrajEM.mixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
   for (l in 0:n.exp) {
     graph[, l + 1] <- MyTime^l
   }
-  #
+  
 
   MyResults <- matrix(0, length(MyTime), nb.grp)
   MyBeta <- fix.effect[fix.var]
@@ -589,16 +567,19 @@ MyTrajEM.mixed <- function(data, formula = ~ 1 + time + time2, num = "value", de
 
   data$group.final <- group.alloc
 
-  ## Iteration max atteinte
+  ## Is max iteration reached
   ite.max <- sum(nb.iteration == max.iter)
 
-  ## Nombre de groupes voulu
+  ## Proportion of right number of group selected
   bon.group <- sum(nb.group == nb.grp) / simul
 
 
   print(proc.time()[3] - t0)
   return(list(data = data, final.prop.group = final.prop.group[[num.final]], glmer1 = glmer1, graph = cbind(MyTime, MyResults), ite.max = ite.max, bon.group = bon.group, ICL.BIC = final.ICL.BIC))
 }
+
+
+
 
 
 #### Function Graph
