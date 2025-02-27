@@ -643,7 +643,7 @@ graph.result.1 <- function(Traj, age.intercept = 15) {
   i <- 1
   while (i <= NbGrp) {
     df <- dat[[i]]
-    p <- p + geom_line(data = df, aes(x = MyTime, y = Result), col = MyCol[i], size = 1.5)
+    p <- p + geom_line(data = df, aes(x = MyTime, y = Result), col = MyCol[i], linewidth = 1.5)
     i <- i + 1
   }
 
@@ -675,7 +675,7 @@ graph.result.1 <- function(Traj, age.intercept = 15) {
 
   q <- ggplot() +
     geom_line(data = Traj.graph, aes(x = age_cat, y = num / denom, group = id, col = group.final)) +
-    geom_line(data = temp2, aes(x = MyTime + 30, y = value, group = group.final), size = 1, col = "black", linetype = "solid") +
+    geom_line(data = temp2, aes(x = MyTime + 30, y = value, group = group.final), linewidth = 1, col = "black", linetype = "solid") +
     theme_bw() +
     scale_color_manual(values = MyCol) +
     theme(legend.position = "none") +
